@@ -17,6 +17,8 @@ Windows のマウスカーソル設定（.cur / .ani）をプリセットとし�
 解凍すると次の構成になっています。  
 ```
 CursorPresetTool/  
+ ├ README.md
+ ├ LICENSE.txt
  ├ CursorPresetTool.exe  
  ├ CursorPresetTool.bat        ← プリセット選択・適用  
  ├ AddPreset.bat               ← 現在の設定を新規プリセットとして保存  
@@ -72,3 +74,6 @@ Wait       （待ち状態）
 
 ## 対応環境
 Windows 10 / Windows 11
+
+## ライセンス
+MIT LICENSE
