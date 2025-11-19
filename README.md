@@ -11,7 +11,7 @@ Windows のマウスカーソル設定（.cur / .ani）をプリセットとし�
 
 ## ダウンロード
 [Releases](https://github.com/Nyamosyan/CursorPresetTool/releases)から `CursorPresetTool.zip` をダウンロードしてください。  
-[こちら](https://github.com/Nyamosyan/CursorPresetTool/releases/latest/CursorPresetTool.zip)から最新版を直接ダウンロードできます。
+[こちら](https://github.com/Nyamosyan/CursorPresetTool/releases/latest/download/CursorPresetTool.zip)から最新版を直接ダウンロードできます。
 
 ## フォルダ構成
 解凍すると次の構成になっています。  
