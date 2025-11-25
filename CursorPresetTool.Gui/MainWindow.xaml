@@ -1,13 +1,17 @@
 ﻿<Window x:Class="CursorPresetTool.Gui.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CursorPresetTool"
+        xmlns:local="clr-namespace:CursorPresetTool.Gui.Converters"
+        xmlns:loc="clr-namespace:CursorPresetTool.Gui.Localization"
+        Title="{Binding Source={StaticResource L}, Path=[MainWindow.Title]}"
         Height="500"
         Width="800"
         MinHeight="500"
         MinWidth="800"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <local:BoolToCollapsedConverter x:Key="BoolToCollapsed" />
         <!-- ヘッダーのアイコンボタン共通スタイル -->
         <Style x:Key="HeaderIconButton"
                TargetType="Button">
@@ -81,7 +85,7 @@
 
                 <!-- 左：ラベル -->
                 <TextBlock Grid.Column="0"
-                           Text="プリセット一覧"
+                           Text="{Binding Source={StaticResource L}, Path=[MainWindow.PresetList]}"
                            VerticalAlignment="Center"
                            FontWeight="Bold"
                            Margin="0,0,8,0" />
@@ -93,16 +97,16 @@
 
                     <!-- ＋メニュー（新規 / インポート） -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="プリセットを追加"
+                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.ToolTip.AddPreset]}"
                             Click="AddPresetButton_Click">
                         <Button.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="新規プリセット..."
+                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Create]}"
                                           Click="NewPresetMenuItem_Click" />
                                 <Separator />
-                                <MenuItem Header="インポート（フォルダ）..."
+                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.ImportFolder]}"
                                           Click="ImportFolderButton_Click" />
-                                <MenuItem Header="インポート（ZIP）..."
+                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.ImportZip]}"
                                           Click="ImportZipButton_Click" />
                             </ContextMenu>
                         </Button.ContextMenu>
@@ -136,7 +140,7 @@
 
                 <!-- 左：ラベル -->
                 <TextBlock Grid.Column="0"
-                           Text="プリセット詳細"
+                           Text="{Binding Source={StaticResource L}, Path=[MainWindow.PresetDetail]}"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
                            Margin="0,0,8,0" />
@@ -146,23 +150,16 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
 
-                    <!-- エクスポート -->
-                    <!--<Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="プリセットをZIPとしてエクスポート"
-                            Click="ExportButton_Click">
-                        <TextBlock Text="&#xE74E;" />
-                    </Button>-->
-
                     <!-- 編集モードへ -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="プリセットを編集"
+                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Edit]}"
                             Click="EditButton_Click">
                         <TextBlock Text="&#xE70F;" />
                     </Button>
 
                     <!-- 適用 -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="プリセットを適用"
+                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Apply]}"
                             Click="ApplyButton_Click">
                         <TextBlock Text="&#xE8FB;" />
                     </Button>
@@ -191,19 +188,76 @@
                                     BorderThickness="0,0,0,1"
                                     Padding="8"
                                     ToolTip="{Binding FolderPath}">
-                                <StackPanel>
+
+                                <!-- 適用中なら背景色を変える -->
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background"
+                                                Value="Transparent" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsApplied}"
+                                                         Value="True">
+                                                <Setter Property="Background"
+                                                        Value="#D0E6FF" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <!-- 本体表示 -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <!-- ピン用の固定幅カラム（常に幅は確保） -->
+                                        <ColumnDefinition Width="22" />
+                                        <!-- テキスト用 -->
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- ピンアイコン（2行ぶち抜き） -->
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="0"
+                                               Grid.RowSpan="2"
+                                               Text="&#xE718;"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Left">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPinned}"
+                                                                 Value="True">
+                                                        <Setter Property="Visibility"
+                                                                Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
                                     <!-- 表示名（pack.json の PackName） -->
-                                    <TextBlock Text="{Binding PackName}"
+                                    <TextBlock Grid.Row="0"
+                                               Grid.Column="1"
+                                               Text="{Binding PackName}"
                                                FontWeight="SemiBold"
                                                TextTrimming="CharacterEllipsis" />
 
                                     <!-- フォルダ名（PresetInfo.Name） -->
-                                    <TextBlock Text="{Binding Name, StringFormat=({0})}"
+                                    <TextBlock Grid.Row="1"
+                                               Grid.Column="1"
+                                               Text="{Binding Name, StringFormat=({0})}"
                                                FontSize="11"
                                                Foreground="Gray"
                                                Margin="0,2,0,0"
                                                TextTrimming="CharacterEllipsis" />
-                                </StackPanel>
+                                </Grid>
+
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -211,6 +265,13 @@
                     <!-- ★ ListBox 全体にコンテキストメニューを付ける -->
                     <ListBox.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="ピン留め"
+                                      Click="PinPresetMenuItem_Click"
+                                      Visibility="{Binding IsPinned, Converter={StaticResource BoolToCollapsed}}" />
+                            <MenuItem Header="ピン留め解除"
+                                      Click="UnpinPresetMenuItem_Click"
+                                      Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}" />
+                            <Separator />
                             <MenuItem Header="フォルダを開く"
                                       Click="OpenFolderMenuItem_Click" />
                             <Separator />

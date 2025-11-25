@@ -5,7 +5,7 @@ namespace CursorPresetTool.Gui.ViewModels
     /// <summary>
     /// プリセット一覧の1行分を表す ViewModel。
     /// </summary>
-    public sealed class PresetItemViewModel
+    public sealed class PresetItemViewModel : ViewModelBase
     {
         public PresetInfo PresetInfo { get; }
 
@@ -22,9 +22,25 @@ namespace CursorPresetTool.Gui.ViewModels
 
         public string DisplayName => $"{Name} ({PackName})";
 
+        private bool _isApplied;
+        public bool IsApplied
+        {
+            get => _isApplied;
+            set => SetProperty(ref _isApplied, value);
+        }
+
+        private bool _isPinned;
+        public bool IsPinned
+        {
+            get => _isPinned;
+            set => SetProperty(ref _isPinned, value);
+        }
+
         public PresetItemViewModel(PresetInfo presetInfo)
         {
             PresetInfo = presetInfo;
+            _isApplied = false;
+            _isPinned = false;
         }
     }
 }

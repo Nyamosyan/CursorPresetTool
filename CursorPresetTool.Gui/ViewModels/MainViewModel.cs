@@ -1,15 +1,17 @@
-﻿using System;
+﻿using CursorPresetTool.Core.Cursors;
+using CursorPresetTool.Core.Models;
+using CursorPresetTool.Core.Packs;
+using CursorPresetTool.Gui.Config;
+using CursorPresetTool.Gui.Imaging;
+using CursorPresetTool.Gui.Localization;
+using CursorPresetTool.Gui.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
-using CursorPresetTool.Core.Cursors;
-using CursorPresetTool.Core.Models;
-using CursorPresetTool.Core.Packs;
-using CursorPresetTool.Gui.Imaging;
-using CursorPresetTool.Gui.Services;
 
 namespace CursorPresetTool.Gui.ViewModels
 {
@@ -21,6 +23,9 @@ namespace CursorPresetTool.Gui.ViewModels
     {
         private readonly PresetService _presetService;
         private readonly SystemCursorProvider _systemCursorProvider;
+        private readonly ConfigService _configService;
+        private readonly LocalizationService _localizationService;
+
 
         public ObservableCollection<PresetItemViewModel> Presets { get; } = new();
         public ObservableCollection<CursorComparisonItemViewModel> CursorItems { get; } = new();
@@ -40,16 +45,35 @@ namespace CursorPresetTool.Gui.ViewModels
             }
         }
 
-        // MainWindow から呼びやすいように、PresetService だけ受け取るコンストラクタも用意
-        public MainViewModel(PresetService presetService)
-            : this(presetService, new SystemCursorProvider())
-        {
-        }
-
-        public MainViewModel(PresetService presetService, SystemCursorProvider systemCursorProvider)
+        public MainViewModel(
+            PresetService presetService,
+            SystemCursorProvider systemCursorProvider,
+            ConfigService configService,
+            LocalizationService localizationService)
         {
             _presetService = presetService;
             _systemCursorProvider = systemCursorProvider;
+            _configService = configService;
+            _localizationService = localizationService;
+
+            Presets = new ObservableCollection<PresetItemViewModel>();
+
+            LoadPresets();
+            RestorePinnedFromConfig();
+        }
+
+        private void RestorePinnedFromConfig()
+        {
+            var pinnedSet = new HashSet<string>(_configService.Current.PinnedPresets,
+                                                StringComparer.OrdinalIgnoreCase);
+
+            foreach (var p in Presets)
+            {
+                // PresetInfo.Name をキーにする（＝フォルダ名）
+                p.IsPinned = pinnedSet.Contains(p.Name);
+            }
+
+            ResortPresets();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -222,7 +246,17 @@ namespace CursorPresetTool.Gui.ViewModels
             if (SelectedPreset is null)
                 return;
 
+            // 実際にカーソルを適用
             _presetService.ApplyPreset(SelectedPreset.PresetInfo);
+
+            // ★ 一覧の「適用中」フラグを更新
+            foreach (var preset in Presets)
+            {
+                preset.IsApplied = ReferenceEquals(preset, SelectedPreset);
+            }
+
+            // ★ 右下の比較リストも現在カーソルを取り直して再構築
+            RebuildCursorItems();
         }
 
         /// <summary>
@@ -238,5 +272,26 @@ namespace CursorPresetTool.Gui.ViewModels
             // 生成されたプリセットを選択した状態で一覧をリロード
             ReloadPresets(duplicated.FolderPath);
         }
+
+        public void ResortPresets()
+        {
+            // ピン留め → 非ピン留め の順で並べ替える
+            var sorted = Presets
+                .OrderByDescending(p => p.IsPinned)
+                .ThenBy(p => p.PackName)
+                .ToList();
+
+            // コレクションをクリアして並べ替えた順に追加
+            Presets.Clear();
+            foreach (var p in sorted)
+                Presets.Add(p);
+
+            var pinnedFolders = Presets
+                .Where(p => p.IsPinned)
+                .Select(p => p.Name);
+
+            _configService.UpdatePinnedPresets(pinnedFolders);
+        }
+
     }
 }

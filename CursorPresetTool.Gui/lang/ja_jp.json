@@ -1,0 +1,12 @@
+﻿{
+  "MainWindow.Title": "CursorPresetTool",
+  "MainWindow.PresetList": "プリセット一覧",
+  "MainWindow.ToolTip.AddPreset": "プリセットを追加",
+  "MainWindow.Button.Create": "新規プリセットを作成",
+  "MainWindow.Button.ImportFolder": "フォルダからインポート",
+  "MainWindow.Button.ImportZip": "ZIPからインポート",
+  "MainWindow.Button.Reload": "再読み込み",
+  "MainWindow.PresetDetail": "プリセット詳細",
+  "MainWindow.Button.Apply": "プリセットを適用",
+  "MainWindow.Button.Edit": "プリセットを編集"
+}

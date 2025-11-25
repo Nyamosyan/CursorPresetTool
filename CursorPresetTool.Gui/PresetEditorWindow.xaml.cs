@@ -1,6 +1,7 @@
 ﻿using CursorPresetTool.Core.Cursors;
 using CursorPresetTool.Core.Models;
 using CursorPresetTool.Gui.Imaging;
+using CursorPresetTool.Gui.Localization;
 using CursorPresetTool.Gui.Services;
 using CursorPresetTool.Gui.ViewModels;
 using System;
@@ -24,6 +25,7 @@ namespace CursorPresetTool.Gui
         private readonly PresetEditorViewModel _viewModel;
         private readonly PresetService _presetService;
         private readonly string _presetRootDirectory;
+        private readonly LocalizationService _loc;
 
         // スロット編集用のコマンド
         public static readonly RoutedUICommand ClearSlotCommand =
@@ -44,12 +46,14 @@ namespace CursorPresetTool.Gui
         /// </summary>
         public PresetEditorWindow(PresetService presetService,
                                   string presetRootDirectory,
-                                  PresetEditorViewModel viewModel)
+                                  PresetEditorViewModel viewModel,
+                                  LocalizationService localization)
         {
             InitializeComponent();
             _presetService = presetService;
             _presetRootDirectory = presetRootDirectory;
             _viewModel = viewModel;
+            _loc = localization;
             DataContext = _viewModel;
         }
 
@@ -376,21 +380,11 @@ namespace CursorPresetTool.Gui
 
             try
             {
-                // フォルダを開く
-                var folder = System.IO.Path.GetDirectoryName(path);
-                if (folder == null)
-                {
-                    MessageBox.Show(this,
-                        "フォルダーを取得できませんでした。",
-                        "エラー",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                    return;
-                }
-
+                // エクスプローラで「そのファイルを選択した状態」でフォルダを開く
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = folder,
+                    FileName = "explorer.exe",
+                    Arguments = $"/select,\"{path}\"",
                     UseShellExecute = true
                 });
             }

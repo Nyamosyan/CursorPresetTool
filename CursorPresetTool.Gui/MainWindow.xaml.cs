@@ -1,4 +1,6 @@
 ﻿using CursorPresetTool.Core.Cursors;
+using CursorPresetTool.Gui.Config;
+using CursorPresetTool.Gui.Localization;
 using CursorPresetTool.Gui.Models;
 using CursorPresetTool.Gui.Services;
 using CursorPresetTool.Gui.ViewModels;
@@ -28,19 +30,19 @@ namespace CursorPresetTool.Gui
         private readonly string _presetRootDirectory;
         private readonly PresetService _presetService;
         private readonly SystemCursorProvider _systemCursorProvider;
+        private readonly LocalizationService _localization;
 
-        public MainWindow()
+        public MainWindow(ConfigService configService, LocalizationService localization)
         {
             InitializeComponent();
 
-            // presets フォルダは exe と同じ階層に作る
             _presetRootDirectory = Path.Combine(AppContext.BaseDirectory, "presets");
             _presetService = new PresetService(_presetRootDirectory);
-            var vm = new MainViewModel(_presetService);
+            _systemCursorProvider = new SystemCursorProvider();
+            _localization = localization;
+            var vm = new MainViewModel(_presetService, _systemCursorProvider, configService, _localization);
 
             DataContext = vm;
-
-            _systemCursorProvider = new SystemCursorProvider();
 
             // 起動時にプリセット一覧を読み込む
             vm.LoadPresets();
@@ -104,7 +106,7 @@ namespace CursorPresetTool.Gui
                     }
             }
 
-            var editorWindow = new PresetEditorWindow(_presetService, _presetRootDirectory, editorVm)
+            var editorWindow = new PresetEditorWindow(_presetService, _presetRootDirectory, editorVm, _localization)
             {
                 Owner = this
             };
@@ -278,7 +280,7 @@ namespace CursorPresetTool.Gui
             var presetInfo = ViewModel.SelectedPreset.PresetInfo;
             var editorVm = PresetEditorViewModel.FromExistingPreset(presetInfo);
 
-            var editorWindow = new PresetEditorWindow(_presetService, _presetRootDirectory, editorVm)
+            var editorWindow = new PresetEditorWindow(_presetService, _presetRootDirectory, editorVm, _localization)
             {
                 Owner = this
             };
@@ -471,6 +473,22 @@ namespace CursorPresetTool.Gui
             gridView.Columns[2].Width = unit * 1; // プリセット
         }
 
+        private void PinPresetMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.SelectedPreset is null)
+                return;
 
+            ViewModel.SelectedPreset.IsPinned = true;
+            ViewModel.ResortPresets();
+        }
+
+        private void UnpinPresetMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel.SelectedPreset is null)
+                return;
+
+            ViewModel.SelectedPreset.IsPinned = false;
+            ViewModel.ResortPresets();
+        }
     }
 }
