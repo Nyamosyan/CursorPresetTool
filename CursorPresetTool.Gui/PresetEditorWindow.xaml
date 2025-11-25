@@ -1,0 +1,313 @@
+﻿<Window x:Class="CursorPresetTool.Gui.PresetEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CursorPresetTool.Gui"
+        Title="プリセット編集"
+        Height="500"
+        Width="800"
+        MinHeight="500"
+        MinWidth="800"
+        WindowStartupLocation="CenterOwner">
+    
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:PresetEditorWindow.ClearSlotCommand}"
+                        CanExecute="SlotCommand_CanExecute"
+                        Executed="ClearSlotCommand_Executed" />
+        <CommandBinding Command="{x:Static local:PresetEditorWindow.UseCurrentSlotCommand}"
+                        CanExecute="SlotCommand_CanExecute"
+                        Executed="UseCurrentSlotCommand_Executed" />
+        <CommandBinding Command="{x:Static local:PresetEditorWindow.OpenSlotFileCommand}"
+                        CanExecute="SlotCommand_CanExecute"
+                        Executed="OpenSlotFileCommand_Executed" />
+        <CommandBinding Command="{x:Static local:PresetEditorWindow.CopyRelativePathCommand}"
+                        CanExecute="SlotCommand_CanExecute"
+                        Executed="CopyRelativePathCommand_Executed" />
+    </Window.CommandBindings>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 上部：基本情報 -->
+        <Border Grid.Row="0"
+                Padding="8"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD"
+                CornerRadius="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- PackName -->
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Text="プリセット名:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,4,0" />
+                <TextBox Grid.Row="0"
+                         Grid.Column="1"
+                         Text="{Binding PackName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,8,0" />
+
+                <!-- Author -->
+                <TextBlock Grid.Row="0"
+                           Grid.Column="2"
+                           Text="作者:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,4,0" />
+                <TextBox Grid.Row="0"
+                         Grid.Column="3"
+                         Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Version -->
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="バージョン:"
+                           VerticalAlignment="Center"
+                           Margin="0,4,4,0" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="1"
+                         Text="{Binding Version, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,4,8,0" />
+
+                <!-- 説明 -->
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Text="説明:"
+                           Margin="0,8,4,0" />
+                <TextBox Grid.Row="2"
+                         Grid.Column="1"
+                         Grid.ColumnSpan="3"
+                         Margin="0,8,0,0"
+                         Height="80"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+        </Border>
+
+        <!-- 中央：カーソルスロット一覧 -->
+        <Border Grid.Row="2"
+                Padding="8"
+                BorderThickness="1"
+                BorderBrush="#DDDDDD"
+                CornerRadius="4">
+            <ListView x:Name="SlotListView"
+                      ItemsSource="{Binding Slots}"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      SizeChanged="SlotListView_SizeChanged">
+
+                <ListView.Resources>
+                    <!-- ヘッダーをリサイズ不可 & クリック無効にする -->
+                    <Style TargetType="{x:Type GridViewColumnHeader}">
+                        <Setter Property="IsHitTestVisible"
+                                Value="False" />
+                    </Style>
+                </ListView.Resources>
+
+                <!-- 各行(ListViewItem)のスタイル + コンテキストメニュー -->
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment"
+                                Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment"
+                                Value="Center" />
+
+                        <!-- ▼ スロット右クリック用のコンテキストメニュー -->
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="このスロットをクリア"
+                                              Command="{x:Static local:PresetEditorWindow.ClearSlotCommand}"
+                                              CommandParameter="{Binding}" />
+                                    <MenuItem Header="現在のカーソルを使用"
+                                              Command="{x:Static local:PresetEditorWindow.UseCurrentSlotCommand}"
+                                              CommandParameter="{Binding}" />
+                                    <Separator />
+                                    <MenuItem Header="フォルダを開く"
+                                              Command="{x:Static local:PresetEditorWindow.OpenSlotFileCommand}"
+                                              CommandParameter="{Binding}" />
+                                    <MenuItem Header="相対パスをコピー"
+                                              Command="{x:Static local:PresetEditorWindow.CopyRelativePathCommand}"
+                                              CommandParameter="{Binding}" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.View>
+                    <GridView>
+
+                        <!-- スロット名（項目） -->
+                        <GridViewColumn Header="項目">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="4,0">
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Key}"
+                                                   FontSize="11"
+                                                   Foreground="Gray" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- カーソルファイル（プレビュー + クリック & DnD） -->
+                        <GridViewColumn Header="カーソルファイル">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+
+                                    <!-- クリック & D&D 受付ボックス -->
+                                    <Border Width="32"
+                                            Height="32"
+                                            BorderBrush="#CCCCCC"
+                                            BorderThickness="1"
+                                            CornerRadius="3"
+                                            Background="White"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            AllowDrop="True"
+                                            MouseLeftButtonUp="CursorPreview_MouseLeftButtonUp"
+                                            Drop="CursorPreview_Drop"
+                                            DragEnter="CursorPreview_DragEnter"
+                                            ToolTip="{Binding FullPath}">
+
+                                        <Grid HorizontalAlignment="Center"
+                                              VerticalAlignment="Center">
+
+                                            <!-- 実画像 -->
+                                            <Image Source="{Binding PreviewImage}"
+                                                   Stretch="Uniform">
+                                                <Image.Style>
+                                                    <Style TargetType="Image">
+                                                        <Setter Property="Opacity"
+                                                                Value="1" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMissing}"
+                                                                         Value="True">
+                                                                <Setter Property="Opacity"
+                                                                        Value="0" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+
+                                            <!-- Missing アイコン -->
+                                            <TextBlock Text="&#xE9CE;"
+                                                       FontFamily="Segoe Fluent Icons"
+                                                       FontSize="20"
+                                                       Foreground="Gray"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMissing}"
+                                                                         Value="True">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+
+                                        </Grid>
+                                    </Border>
+
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                    </GridView>
+                </ListView.View>
+
+            </ListView>
+
+        </Border>
+
+        <!-- 下部：フォルダ名 + チェック + ボタン -->
+        <Grid Grid.Row="4"
+              Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <!-- 左：フォルダ名＆チェック -->
+                <ColumnDefinition Width="*" />
+                <!-- 右：ボタン -->
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 左側：フォルダ名 & PackName同期チェック -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+                <TextBlock Text="フォルダ名:"
+                           Margin="0,0,4,0"
+                           VerticalAlignment="Center" />
+                <TextBox Width="180"
+                         Text="{Binding FolderName, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <!-- デフォルト：IsNew によって有効/無効 -->
+                            <Setter Property="IsEnabled"
+                                    Value="{Binding IsNew}" />
+                            <Style.Triggers>
+                                <!-- PackNameをフォルダ名として使用 = true のときは必ず無効 -->
+                                <DataTrigger Binding="{Binding UsePackNameAsFolderName}"
+                                             Value="True">
+                                    <Setter Property="IsEnabled"
+                                            Value="False" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <CheckBox Content="PackNameをフォルダ名として使用"
+                          Margin="12,0,0,0"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding UsePackNameAsFolderName}"
+                          IsEnabled="{Binding IsNew}" />
+            </StackPanel>
+
+            <!-- 右側：ボタン -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="ZIPとしてエクスポート..."
+                        Margin="0,0,8,0"
+                        Click="ExportZipButton_Click" />
+
+                <Button Content="保存"
+                        Width="80"
+                        Margin="0,0,8,0"
+                        Click="SaveButton_Click" />
+
+                <Button Content="キャンセル"
+                        Width="80"
+                        Click="CancelButton_Click" />
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

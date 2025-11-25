@@ -1,0 +1,459 @@
+﻿<Window x:Class="CursorPresetTool.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CursorPresetTool"
+        Height="500"
+        Width="800"
+        MinHeight="500"
+        MinWidth="800"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- ヘッダーのアイコンボタン共通スタイル -->
+        <Style x:Key="HeaderIconButton"
+               TargetType="Button">
+            <Setter Property="Width"
+                    Value="32" />
+            <Setter Property="Height"
+                    Value="32" />
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="Margin"
+                    Value="4,0,0,0" />
+            <Setter Property="FontFamily"
+                    Value="Segoe Fluent Icons" />
+            <Setter Property="FontSize"
+                    Value="16" />
+            <Setter Property="Background"
+                    Value="#F5F5F5" />
+            <Setter Property="BorderBrush"
+                    Value="#CCCCCC" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <!-- 上：ヘッダー行 / 下：本体 -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 左：一覧 / 右：詳細-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="4" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 上部ヘッダー（左側：一覧 + インポート系） -->
+        <Border Grid.Row="0"
+                Grid.Column="0"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Padding="4"
+                CornerRadius="4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 左：ラベル -->
+                <TextBlock Grid.Column="0"
+                           Text="プリセット一覧"
+                           VerticalAlignment="Center"
+                           FontWeight="Bold"
+                           Margin="0,0,8,0" />
+
+                <!-- 右：アイコンボタン群 -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                    <!-- ＋メニュー（新規 / インポート） -->
+                    <Button Style="{StaticResource HeaderIconButton}"
+                            ToolTip="プリセットを追加"
+                            Click="AddPresetButton_Click">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="新規プリセット..."
+                                          Click="NewPresetMenuItem_Click" />
+                                <Separator />
+                                <MenuItem Header="インポート（フォルダ）..."
+                                          Click="ImportFolderButton_Click" />
+                                <MenuItem Header="インポート（ZIP）..."
+                                          Click="ImportZipButton_Click" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                        <!-- ＋アイコン -->
+                        <TextBlock Text="&#xE710;" />
+                        <!-- Segoe Fluent の＋みたいなやつ -->
+                    </Button>
+
+                    <!-- 再読み込み -->
+                    <Button Style="{StaticResource HeaderIconButton}"
+                            ToolTip="一覧を再読み込み"
+                            Click="ReloadButton_Click">
+                        <TextBlock Text="&#xE72C;" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 上部ヘッダー（右側：詳細 + export/apply） -->
+        <Border Grid.Row="0"
+                Grid.Column="2"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Padding="4"
+                CornerRadius="4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 左：ラベル -->
+                <TextBlock Grid.Column="0"
+                           Text="プリセット詳細"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
+
+                <!-- 右：export / apply アイコンボタン -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                    <!-- エクスポート -->
+                    <!--<Button Style="{StaticResource HeaderIconButton}"
+                            ToolTip="プリセットをZIPとしてエクスポート"
+                            Click="ExportButton_Click">
+                        <TextBlock Text="&#xE74E;" />
+                    </Button>-->
+
+                    <!-- 編集モードへ -->
+                    <Button Style="{StaticResource HeaderIconButton}"
+                            ToolTip="プリセットを編集"
+                            Click="EditButton_Click">
+                        <TextBlock Text="&#xE70F;" />
+                    </Button>
+
+                    <!-- 適用 -->
+                    <Button Style="{StaticResource HeaderIconButton}"
+                            ToolTip="プリセットを適用"
+                            Click="ApplyButton_Click">
+                        <TextBlock Text="&#xE8FB;" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== 左：一覧本体 ===== -->
+        <Border Grid.Row="2"
+                Grid.Column="0"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Padding="4"
+                CornerRadius="4">
+            <DockPanel>
+                <ListBox x:Name="PresetListBox"
+                         ItemsSource="{Binding Presets}"
+                         SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
+                         Margin="0,0,0,0"
+                         BorderThickness="0"
+                         HorizontalContentAlignment="Stretch"
+                         PreviewMouseRightButtonDown="PresetListBox_PreviewMouseRightButtonDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="#DDDDDD"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="8"
+                                    ToolTip="{Binding FolderPath}">
+                                <StackPanel>
+                                    <!-- 表示名（pack.json の PackName） -->
+                                    <TextBlock Text="{Binding PackName}"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <!-- フォルダ名（PresetInfo.Name） -->
+                                    <TextBlock Text="{Binding Name, StringFormat=({0})}"
+                                               FontSize="11"
+                                               Foreground="Gray"
+                                               Margin="0,2,0,0"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <!-- ★ ListBox 全体にコンテキストメニューを付ける -->
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="フォルダを開く"
+                                      Click="OpenFolderMenuItem_Click" />
+                            <Separator />
+                            <MenuItem Header="名前を変更..."
+                                      Click="RenamePresetMenuItem_Click" />
+                            <MenuItem Header="複製..."
+                                      Click="DuplicatePresetMenuItem_Click" />
+                            <Separator />
+                            <MenuItem Header="削除..."
+                                      Click="DeletePresetMenuItem_Click" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- ===== 右：詳細本体 ===== -->
+        <Border Grid.Row="2"
+                Grid.Column="2"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Padding="10"
+                CornerRadius="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- タイトル＋基本情報 -->
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="{Binding SelectedPreset.PackName}"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis" />
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,4,0,0">
+                        <TextBlock Text="{Binding SelectedPreset.Author, StringFormat=Author: {0}}"
+                                   Margin="0,0,12,0" />
+                        <TextBlock Text="{Binding SelectedPreset.Version, StringFormat=Version: {0}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 説明 -->
+                <Border Grid.Row="1"
+                        Margin="0,8,0,0"
+                        BorderBrush="#DDDDDD"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="6">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock Text="{Binding SelectedPreset.Description}"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis" />
+                    </ScrollViewer>
+                </Border>
+
+                <!-- カーソル項目一覧 見出し -->
+                <TextBlock Grid.Row="2"
+                           Text="カーソル項目一覧"
+                           FontWeight="Bold"
+                           Margin="0,12,0,6" />
+
+                <!-- カーソル項目一覧 本体 -->
+                <Border Grid.Row="3"
+                        BorderBrush="#DDDDDD"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        Padding="4">
+                    <ListView x:Name="CursorListView"
+                              ItemsSource="{Binding CursorItems}"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              SizeChanged="CursorListView_SizeChanged">
+
+                        <!-- ヘッダーをリサイズできないようにする -->
+                        <ListView.Resources>
+                            <Style TargetType="{x:Type GridViewColumnHeader}">
+                                <Setter Property="IsHitTestVisible"
+                                        Value="False" />
+                            </Style>
+
+                            <!-- 行は幅いっぱいに広げる（デフォに近い） -->
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment"
+                                        Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment"
+                                        Value="Center" />
+                            </Style>
+
+                        </ListView.Resources>
+
+                        <ListView.View>
+                            <GridView>
+                                <!-- 項目名＋キー名 -->
+                                <GridViewColumn Header="項目">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <DockPanel HorizontalAlignment="Stretch">
+                                                <StackPanel Margin="4,0,0,0">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               FontWeight="SemiBold"
+                                                               TextAlignment="Left" />
+                                                    <TextBlock Text="{Binding KeyName, StringFormat=({0})}"
+                                                               FontSize="11"
+                                                               Foreground="Gray"
+                                                               TextAlignment="Left"
+                                                               Margin="0,2,0,0" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- 適用中プレビュー -->
+                                <GridViewColumn Header="適用中">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <!-- ★ 細い枠付きのプレビューボックス -->
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    BorderBrush="#CCCCCC"
+                                                    BorderThickness="1"
+                                                    CornerRadius="2"
+                                                    Background="White">
+                                                <Grid HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center">
+                                                    <!-- 実画像 -->
+                                                    <Image Source="{Binding CurrentImage}"
+                                                           Stretch="None"
+                                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                                           ToolTip="{Binding CurrentFullPath}">
+                                                        <Image.Style>
+                                                            <Style TargetType="Image">
+                                                                <Setter Property="Opacity"
+                                                                        Value="1" />
+                                                                <Style.Triggers>
+                                                                    <!-- Missing のときは透明に -->
+                                                                    <DataTrigger Binding="{Binding IsCurrentMissing}"
+                                                                                 Value="True">
+                                                                        <Setter Property="Opacity"
+                                                                                Value="0" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Image.Style>
+                                                    </Image>
+
+                                                    <!-- Missingアイコン -->
+                                                    <TextBlock Text="&#xE9CE;"
+                                                               FontFamily="Segoe Fluent Icons"
+                                                               FontSize="20"
+                                                               Foreground="Gray"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCurrentMissing}"
+                                                                                 Value="True">
+                                                                        <Setter Property="Visibility"
+                                                                                Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- プリセットプレビュー -->
+                                <GridViewColumn Header="プリセット">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <!-- ★ 同じく枠付き -->
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    BorderBrush="#CCCCCC"
+                                                    BorderThickness="1"
+                                                    CornerRadius="2"
+                                                    Background="White">
+                                                <Grid HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center">
+                                                    <Image Source="{Binding PresetImage}"
+                                                           Stretch="None"
+                                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                                           ToolTip="{Binding PresetFullPath}">
+                                                        <Image.Style>
+                                                            <Style TargetType="Image">
+                                                                <Setter Property="Opacity"
+                                                                        Value="1" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsPresetMissing}"
+                                                                                 Value="True">
+                                                                        <Setter Property="Opacity"
+                                                                                Value="0" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Image.Style>
+                                                    </Image>
+
+                                                    <TextBlock Text="&#xE9CE;"
+                                                               FontFamily="Segoe Fluent Icons"
+                                                               FontSize="20"
+                                                               Foreground="Gray"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsPresetMissing}"
+                                                                                 Value="True">
+                                                                        <Setter Property="Visibility"
+                                                                                Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CursorPresetTool.Core/CursorPresetTool.Core.csproj" />
+  <Project Path="CursorPresetTool.Gui/CursorPresetTool.Gui.csproj" />
+</Solution>
