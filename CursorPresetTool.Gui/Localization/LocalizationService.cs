@@ -13,8 +13,11 @@ namespace CursorPresetTool.Gui.Localization
         public string this[string key]
             => _strings.TryGetValue(key, out var v) ? v : key;
 
+        public string LangCode { get; }
+
         public LocalizationService(string langCode)
         {
+            LangCode = string.IsNullOrWhiteSpace(langCode) ? "ja_jp" : langCode;
             Load(langCode);
         }
 
@@ -34,7 +37,7 @@ namespace CursorPresetTool.Gui.Localization
                 _strings.Clear();
                 foreach (var kv in dict)
                 {
-                    _strings[kv.Key] = kv.Value;
+                    _strings[kv.Key] = kv.Value ?? string.Empty;
                 }
             }
             catch

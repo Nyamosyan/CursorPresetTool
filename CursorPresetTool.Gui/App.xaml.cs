@@ -23,9 +23,6 @@ namespace CursorPresetTool.Gui
             var langCode = ConfigService.Current.Lang ?? "ja_jp";
             Localization = new LocalizationService(langCode);
 
-            // XAML から使えるように Application.Resources にも置いておく
-            Resources["L"] = Localization;
-
             var mainWindow = new MainWindow(ConfigService, Localization);
             mainWindow.Show();
         }

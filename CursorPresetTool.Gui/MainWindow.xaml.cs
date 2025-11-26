@@ -127,7 +127,7 @@ namespace CursorPresetTool.Gui
         {
             using var dialog = new Forms.FolderBrowserDialog
             {
-                Description = "pack.json を含むフォルダを選択してください。"
+                Description = Loc.Get("MainWindow.System.ImportFolder.Desc")
             };
 
             var result = dialog.ShowDialog();
@@ -141,8 +141,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"フォルダからのインポートに失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.ImortFolder.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.ImportFolder.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -152,8 +152,8 @@ namespace CursorPresetTool.Gui
         {
             var dialog = new OpenFileDialog
             {
-                Title = "ZIP パックを選択してください",
-                Filter = "ZIP パック (*.zip)|*.zip|すべてのファイル (*.*)|*.*",
+                Title = Loc.Get("MainWindow.System.ImportZip.Title"),
+                Filter = Loc.Get("MainWindow.System.ImportZip.Filter"),
                 CheckFileExists = true,
                 Multiselect = false
             };
@@ -169,8 +169,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"ZIP からのインポートに失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.ImportZip.Error.Msg")}n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.ImportZip.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -185,8 +185,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"プリセット一覧の再読み込みに失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.Reload.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.Reload.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -197,8 +197,8 @@ namespace CursorPresetTool.Gui
             if (ViewModel.SelectedPreset is null)
             {
                 MessageBox.Show(this,
-                    "適用するプリセットが選択されていません。",
-                    "情報",
+                    Loc.Get("MainWindow.System.Apply.Null.Msg"),
+                    Loc.Get("MainWindow.System.Apply.Null.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
                 return;
@@ -208,16 +208,16 @@ namespace CursorPresetTool.Gui
             {
                 ViewModel.ApplySelectedPreset();
                 MessageBox.Show(this,
-                    "プリセットを適用しました。",
-                    "完了",
+                    Loc.Get("MainWindow.System.Apply.Success.Msg"),
+                    Loc.Get("MainWindow.System.Apply.Success.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"プリセットの適用に失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.Apply.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.Apply.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -270,8 +270,8 @@ namespace CursorPresetTool.Gui
             if (ViewModel.SelectedPreset is null)
             {
                 MessageBox.Show(this,
-                    "編集するプリセットを選択してください。",
-                    "情報",
+                    Loc.Get("MainWindow.System.Edit.Null.Msg"),
+                    Loc.Get("MainWindow.System.Edit.Null.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
                 return;
@@ -304,8 +304,8 @@ namespace CursorPresetTool.Gui
             if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
             {
                 MessageBox.Show(this,
-                    "フォルダが見つかりません。",
-                    "エラー",
+                    Loc.Get("MainWindow.System.OpenFolder.Null.Msg"),
+                    Loc.Get("MainWindow.System.OpenFolder.Null.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 return;
@@ -322,8 +322,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"エクスプローラーでフォルダを開けませんでした。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.OpenFolder.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.OpenFolder.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -339,8 +339,8 @@ namespace CursorPresetTool.Gui
 
             // シンプルに InputBox で新しい名前を聞く
             var input = Interaction.InputBox(
-                "新しいプリセット名を入力してください。",
-                "プリセット名の変更",
+                Loc.Get("MainWindow.System.Rename.Prompt"),
+                Loc.Get("MainWindow.System.Rename.Title"),
                 currentName);
 
             if (string.IsNullOrWhiteSpace(input) || input == currentName)
@@ -356,8 +356,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"プリセット名の変更に失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.Rename.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.Rename.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -375,8 +375,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"プリセットの複製に失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.Copy.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.Copy.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -391,9 +391,9 @@ namespace CursorPresetTool.Gui
             var name = ViewModel.SelectedPreset.Name;
 
             var result = MessageBox.Show(this,
-                $"プリセット「{name}」を削除しますか？\n" +
-                "フォルダとファイルは元に戻せません。",
-                "プリセットの削除確認",
+                $"{Loc.Get("MainWindow.System.Delete.LabelA")}{name}{Loc.Get("MainWindow.System.Delete.LabelB")}\n" +
+                Loc.Get("MainWindow.System.Delete.LabelC"),
+                Loc.Get("MainWindow.System.Delete.Cap"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
@@ -407,8 +407,8 @@ namespace CursorPresetTool.Gui
             catch (Exception ex)
             {
                 MessageBox.Show(this,
-                    $"プリセットの削除に失敗しました。\n\n{ex.Message}",
-                    "エラー",
+                    $"{Loc.Get("MainWindow.System.Delete.Error.Msg")}\n\n{ex.Message}",
+                    Loc.Get("MainWindow.System.Delete.Error.Cap"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }

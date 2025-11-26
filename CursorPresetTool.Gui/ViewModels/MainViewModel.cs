@@ -187,6 +187,10 @@ namespace CursorPresetTool.Gui.ViewModels
                 Presets.Add(new PresetItemViewModel(preset));
             }
 
+            // リロード後にピン状態を復元
+            RestorePinnedFromConfig();
+
+            // ↓最後に選択処理
             if (!string.IsNullOrEmpty(previousFolder))
             {
                 SelectedPreset = Presets.FirstOrDefault(p => p.FolderPath == previousFolder)

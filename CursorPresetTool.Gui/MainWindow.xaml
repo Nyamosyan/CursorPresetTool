@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:CursorPresetTool.Gui.Converters"
         xmlns:loc="clr-namespace:CursorPresetTool.Gui.Localization"
-        Title="{Binding Source={StaticResource L}, Path=[MainWindow.Title]}"
+        Title="{loc:Loc Key=MainWindow.Title}"
         Height="500"
         Width="800"
         MinHeight="500"
@@ -85,7 +85,7 @@
 
                 <!-- 左：ラベル -->
                 <TextBlock Grid.Column="0"
-                           Text="{Binding Source={StaticResource L}, Path=[MainWindow.PresetList]}"
+                           Text="{loc:Loc Key=MainWindow.Header.PresetList}"
                            VerticalAlignment="Center"
                            FontWeight="Bold"
                            Margin="0,0,8,0" />
@@ -97,16 +97,16 @@
 
                     <!-- ＋メニュー（新規 / インポート） -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.ToolTip.AddPreset]}"
+                            ToolTip="{loc:Loc Key=MainWindow.ToolTip.AddPreset}"
                             Click="AddPresetButton_Click">
                         <Button.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Create]}"
+                                <MenuItem Header="{loc:Loc Key=MainWindow.Button.Create}"
                                           Click="NewPresetMenuItem_Click" />
                                 <Separator />
-                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.ImportFolder]}"
+                                <MenuItem Header="{loc:Loc Key=MainWindow.Button.ImportFolder}"
                                           Click="ImportFolderButton_Click" />
-                                <MenuItem Header="{Binding Source={StaticResource L}, Path=[MainWindow.Button.ImportZip]}"
+                                <MenuItem Header="{loc:Loc Key=MainWindow.Button.ImportZip}"
                                           Click="ImportZipButton_Click" />
                             </ContextMenu>
                         </Button.ContextMenu>
@@ -117,7 +117,7 @@
 
                     <!-- 再読み込み -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="一覧を再読み込み"
+                            ToolTip="{loc:Loc Key=MainWindow.ToolTip.Reload}"
                             Click="ReloadButton_Click">
                         <TextBlock Text="&#xE72C;" />
                     </Button>
@@ -140,7 +140,7 @@
 
                 <!-- 左：ラベル -->
                 <TextBlock Grid.Column="0"
-                           Text="{Binding Source={StaticResource L}, Path=[MainWindow.PresetDetail]}"
+                           Text="{loc:Loc Key=MainWindow.Header.PresetDetail}"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
                            Margin="0,0,8,0" />
@@ -152,14 +152,14 @@
 
                     <!-- 編集モードへ -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Edit]}"
+                            ToolTip="{loc:Loc Key=MainWindow.ToolTip.Edit}"
                             Click="EditButton_Click">
                         <TextBlock Text="&#xE70F;" />
                     </Button>
 
                     <!-- 適用 -->
                     <Button Style="{StaticResource HeaderIconButton}"
-                            ToolTip="{Binding Source={StaticResource L}, Path=[MainWindow.Button.Apply]}"
+                            ToolTip="{loc:Loc Key=MainWindow.ToolTip.Apply}"
                             Click="ApplyButton_Click">
                         <TextBlock Text="&#xE8FB;" />
                     </Button>
@@ -265,22 +265,22 @@
                     <!-- ★ ListBox 全体にコンテキストメニューを付ける -->
                     <ListBox.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="ピン留め"
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.Pin}"
                                       Click="PinPresetMenuItem_Click"
                                       Visibility="{Binding IsPinned, Converter={StaticResource BoolToCollapsed}}" />
-                            <MenuItem Header="ピン留め解除"
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.Unpin}"
                                       Click="UnpinPresetMenuItem_Click"
                                       Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibility}}" />
                             <Separator />
-                            <MenuItem Header="フォルダを開く"
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.OpenFolder}"
                                       Click="OpenFolderMenuItem_Click" />
                             <Separator />
-                            <MenuItem Header="名前を変更..."
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.Rename}"
                                       Click="RenamePresetMenuItem_Click" />
-                            <MenuItem Header="複製..."
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.Copy}"
                                       Click="DuplicatePresetMenuItem_Click" />
                             <Separator />
-                            <MenuItem Header="削除..."
+                            <MenuItem Header="{loc:Loc Key=MainWindow.Button.Delete}"
                                       Click="DeletePresetMenuItem_Click" />
                         </ContextMenu>
                     </ListBox.ContextMenu>
@@ -311,9 +311,19 @@
                                TextTrimming="CharacterEllipsis" />
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,4,0,0">
-                        <TextBlock Text="{Binding SelectedPreset.Author, StringFormat=Author: {0}}"
-                                   Margin="0,0,12,0" />
-                        <TextBlock Text="{Binding SelectedPreset.Version, StringFormat=Version: {0}}" />
+                        <!-- 作者 -->
+                        <TextBlock Margin="0,0,12,0">
+                            <Run Text="{loc:Loc Key=MainWindow.Label.Author}" />
+                            <Run Text=": " />
+                            <Run Text="{Binding SelectedPreset.Author, Mode=OneWay}" />
+                        </TextBlock>
+
+                        <!-- バージョン -->
+                        <TextBlock>
+                            <Run Text="{loc:Loc Key=MainWindow.Label.Version}" />
+                            <Run Text=": " />
+                            <Run Text="{Binding SelectedPreset.Version, Mode=OneWay}" />
+                        </TextBlock>
                     </StackPanel>
                 </StackPanel>
 
@@ -333,7 +343,7 @@
 
                 <!-- カーソル項目一覧 見出し -->
                 <TextBlock Grid.Row="2"
-                           Text="カーソル項目一覧"
+                           Text="{loc:Loc Key=MainWindow.Label.CursorItems}"
                            FontWeight="Bold"
                            Margin="0,12,0,6" />
 
@@ -368,7 +378,7 @@
                         <ListView.View>
                             <GridView>
                                 <!-- 項目名＋キー名 -->
-                                <GridViewColumn Header="項目">
+                                <GridViewColumn Header="{loc:Loc Key=MainWindow.Label.ItemCol}">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <DockPanel HorizontalAlignment="Stretch">
@@ -388,7 +398,7 @@
                                 </GridViewColumn>
 
                                 <!-- 適用中プレビュー -->
-                                <GridViewColumn Header="適用中">
+                                <GridViewColumn Header="{loc:Loc Key=MainWindow.Label.Current}">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <!-- ★ 細い枠付きのプレビューボックス -->
@@ -451,7 +461,7 @@
                                 </GridViewColumn>
 
                                 <!-- プリセットプレビュー -->
-                                <GridViewColumn Header="プリセット">
+                                <GridViewColumn Header="{loc:Loc Key=MainWindow.Label.Preset}">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <!-- ★ 同じく枠付き -->
